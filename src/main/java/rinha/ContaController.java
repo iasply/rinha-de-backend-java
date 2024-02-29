@@ -7,9 +7,9 @@ import io.vertx.ext.web.handler.BodyHandler;
 public class ContaController {
 
   private static  Vertx vertx;
-  private static ContaService cr = new ContaService();
+  private static final ContaService cr = new ContaService();
   public ContaController(Vertx vertx) {
-  this.vertx = vertx;
+  ContaController.vertx = vertx;
   }
 
   public static Router getRouter() {

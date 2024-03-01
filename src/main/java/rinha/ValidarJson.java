@@ -1,5 +1,6 @@
 package rinha;
 
+
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import rinha.model.TransacaoModel;

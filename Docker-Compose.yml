@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:alpine
+    container_name: meu_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: rinha
+      POSTGRES_PASSWORD: rinha
+      POSTGRES_DB: rinha
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d/meu_script.sql
+      - ./pgconfig:/etc/postgresql/pg_hba.conf
+    ports:
+      - "5432:5432"
+    command: [ "postgres", "-c", "listen_addresses=*", "-c", "config_file=/etc/postgresql/pg_hba.conf" ]

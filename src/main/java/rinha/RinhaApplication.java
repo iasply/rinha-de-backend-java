@@ -1,6 +1,7 @@
 package rinha;
 
 import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.pgclient.PgBuilder;
@@ -14,7 +15,9 @@ public class RinhaApplication {
   private static final Logger logger = LoggerFactory.getLogger(RinhaApplication.class);
 
   public static void main(String[] args) {
-    Vertx vertx = Vertx.vertx();
+    VertxOptions options = new VertxOptions();
+    options.setBlockedThreadCheckInterval(5000);
+    Vertx vertx = Vertx.vertx(options);
 
     PgConnectOptions connectOptions = new PgConnectOptions()
             .setPort(5432)

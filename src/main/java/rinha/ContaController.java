@@ -18,6 +18,6 @@ public class ContaController {
     rt.post("/clientes/:id/transacoes").handler(cr::retornoSaldo);
   }
   public void extrato(Router rt){
-    rt.get("//clientes/:id/extrato").handler(cr::retornoExtrato);
+    rt.get("/clientes/:id/extrato").handler(cr::retornoExtrato);
   }
 }

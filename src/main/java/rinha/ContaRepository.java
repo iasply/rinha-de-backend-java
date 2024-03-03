@@ -4,7 +4,6 @@ import io.vertx.core.Future;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
 import io.vertx.sqlclient.SqlClient;
-import rinha.model.RespostaExtrato;
 import rinha.model.TransacaoModel;
 
 import static rinha.util.Util.getData;
@@ -41,7 +40,20 @@ public class ContaRepository {
     }
 
 
-    public RespostaExtrato getExtrato() {
-        return null;
+    public Future<RowSet<Row>> getExtrato(int id) {
+       return sqlClient.query(
+               "    SELECT *\n" +
+               "    FROM transacao \n" +
+               "    WHERE cliente_id = \n" +id+
+               "    ORDER BY id DESC\n" +
+               "    LIMIT 10\n"
+             ).execute().onComplete(rowSetAsyncResult -> {
+            if (rowSetAsyncResult.succeeded()) {
+                RowSet<Row> result = rowSetAsyncResult.result();
+            } else {
+                System.out.println("Failure: " + rowSetAsyncResult.cause().getMessage());
+            }
+        });
+
     }
 }

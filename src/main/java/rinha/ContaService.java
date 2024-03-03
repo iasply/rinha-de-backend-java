@@ -6,10 +6,11 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
-import rinha.model.ClienteModel;
-import rinha.model.RespostaExtrato;
-import rinha.model.SaldoModel;
-import rinha.model.TransacaoModel;
+import rinha.model.*;
+import rinha.util.Util;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ContaService {
 
@@ -70,6 +71,62 @@ public class ContaService {
 
     }
 
+    public void retornoExtrato(RoutingContext rc) {
+
+
+        String s = rc.pathParam("id");
+        int id = Integer.parseInt(s);
+        if (!(id < 6 && id > 0)) {
+            throw new RuntimeException();
+        }
+
+        Future<RowSet<Row>> rowSetFuture = cr.getExtrato(id);
+        rowSetFuture.onComplete(asyncResult -> {
+
+
+            List<Transacao> list = new ArrayList<>();
+
+            asyncResult.result().forEach(
+                    row -> {
+
+
+                        Transacao transacao = new Transacao();
+                        transacao.setDescricao(row.getString("descricao"));
+                        transacao.setTipo(row.getString("tipo"));
+                        transacao.setRealizada_em(row.getString("data"));
+                        transacao.setValor(row.getInteger("valor"));
+                        list.add(transacao);
+
+                    }
+            );
+
+            Future<RowSet<Row>> rowSetFuture2 =  cr.getCliente(id);
+            rowSetFuture2.onComplete(asyncResult1 -> {
+                Saldo saldo = new Saldo();
+
+                asyncResult1.result().forEach(
+                        row -> {
+                            saldo.setLimite(row.getInteger("limite"));
+                            saldo.setTotal(row.getInteger("saldo"));
+                        }
+                );
+                saldo.setData_extrato(Util.getData());
+
+                RespostaExtrato respostaExtrato = new RespostaExtrato(saldo, list);
+
+
+                if (respostaExtrato != null) {
+                    rc.end(JsonObject.mapFrom(respostaExtrato).encodePrettily());
+                    return;
+                }
+                rc.fail(400);
+
+            });
+        });
+
+
+    }
+
     private boolean validacaoSaldo(ClienteModel clienteModel, TransacaoModel transacaoModel) {
         if (transacaoModel.getTipo() == "c") {
             return true;
@@ -82,24 +139,4 @@ public class ContaService {
         return integer;
     }
 
-    public void retornoExtrato(RoutingContext rc) {
-        RespostaExtrato respostaExtrato = null;
-        try {
-            String s = rc.pathParam("id");
-            int id = Integer.parseInt(s);
-            if (!(id < 6 && id > 0)) {
-                throw new RuntimeException();
-            }
-            respostaExtrato = cr.getExtrato();
-
-        } catch (RuntimeException e) {
-            rc.fail(400);
-        }
-        if (respostaExtrato != null) {
-            rc.end(JsonObject.mapFrom(respostaExtrato).encodePrettily());
-            return;
-        }
-        rc.fail(400);
-
-    }
 }

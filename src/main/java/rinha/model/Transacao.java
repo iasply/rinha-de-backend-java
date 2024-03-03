@@ -1,4 +1,4 @@
-package rinha;
+package rinha.model;
 
 
   public class Transacao {

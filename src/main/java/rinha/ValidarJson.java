@@ -27,7 +27,7 @@ public class ValidarJson {
       transacaoModel.setValor(js.getInteger("valor"));
 
       String tipo = js.getString("tipo");
-      if (!(Objects.equals(tipo, "c") || Objects.equals(tipo, "d"))) {
+      if (!((Objects.equals(tipo, "c")) || (Objects.equals(tipo, "d")))) {
         return null;
       }
       transacaoModel.setTipo(tipo);

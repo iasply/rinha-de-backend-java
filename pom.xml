@@ -2,89 +2,44 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.example</groupId>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>rinha</groupId>
   <artifactId>rinha</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
+
+  <packaging>jar</packaging>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-    <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
-    <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
-    <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
+    <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
+    <maven-shade-plugin.version>3.5.2</maven-shade-plugin.version>
+    <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
 
     <vertx.version>4.5.4</vertx.version>
-    <junit-jupiter.version>5.9.1</junit-jupiter.version>
-
-    <main.verticle>rinha.MainVerticle</main.verticle>
-    <launcher.class>io.vertx.core.Launcher</launcher.class>
   </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>io.vertx</groupId>
-        <artifactId>vertx-stack-depchain</artifactId>
-        <version>${vertx.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <dependency>
       <groupId>io.vertx</groupId>
-      <artifactId>vertx-jdbc-client</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
       <artifactId>vertx-web</artifactId>
-      <scope>compile</scope>
+      <version>4.5.4</version>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-pg-client</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-rx-java3</artifactId>
-      <scope>compile</scope>
+      <version>4.5.4</version>
     </dependency>
     <dependency>
       <groupId>com.ongres.scram</groupId>
       <artifactId>client</artifactId>
       <version>2.1</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.15.3</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-junit5</artifactId>
-      <version>${vertx.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-api</artifactId>
-      <version>${junit-jupiter.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <version>${junit-jupiter.version}</version>
-      <scope>test</scope>
+      <version>2.16.1</version>
     </dependency>
   </dependencies>
 
@@ -111,14 +66,10 @@
                 <transformer
                   implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                   <manifestEntries>
-                    <Main-Class>${launcher.class}</Main-Class>
-                    <Main-Verticle>${main.verticle}</Main-Verticle>
+                    <Main-Class>com.gabrielluciano.rinha.RinhaApplication</Main-Class>
                   </manifestEntries>
                 </transformer>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
               </transformers>
-              <outputFile>${project.build.directory}/${project.artifactId}-${project.version}-fat.jar
-              </outputFile>
             </configuration>
           </execution>
         </executions>
@@ -126,18 +77,6 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${maven-surefire-plugin.version}</version>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>${exec-maven-plugin.version}</version>
-        <configuration>
-          <mainClass>io.vertx.core.Launcher</mainClass>
-          <arguments>
-            <argument>run</argument>
-            <argument>${main.verticle}</argument>
-          </arguments>
-        </configuration>
       </plugin>
     </plugins>
   </build>

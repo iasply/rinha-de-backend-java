@@ -1,34 +1,47 @@
 package rinha;
 
-import io.vertx.pgclient.PgConnectOptions;
-import io.vertx.rxjava3.core.Vertx;
-import io.vertx.rxjava3.pgclient.PgBuilder;
-import io.vertx.rxjava3.sqlclient.SqlClient;
-import io.vertx.sqlclient.PoolOptions;
-import rinha.model.ClienteModel;
+import io.vertx.core.Future;
+import io.vertx.sqlclient.Row;
+import io.vertx.sqlclient.RowSet;
+import io.vertx.sqlclient.SqlClient;
+import rinha.model.RespostaExtrato;
+import rinha.model.TransacaoModel;
 
-import java.util.ArrayList;
-import java.util.List;
+import static rinha.util.Util.getData;
 
 public class ContaRepository {
-  private final SqlClient client;
+
+    private SqlClient sqlClient;
+
+    public ContaRepository(SqlClient sqlClient) {
+        this.sqlClient = sqlClient;
+    }
 
 
-  public ContaRepository(SqlClient client) {
-    this.client = client;
-  }
+    public Future<RowSet<Row>> getCliente(int id) {
+        return sqlClient.query("SELECT * FROM cliente WHERE id =" + id).execute().onComplete(rowSetAsyncResult -> {
+            if (rowSetAsyncResult.succeeded()) {
+                RowSet<Row> result = rowSetAsyncResult.result();
+            } else {
+                System.out.println("Failure: " + rowSetAsyncResult.cause().getMessage());
+            }
+        });
+    }
+
+    public void updateCliente(int id, Integer saldo, TransacaoModel transacaoModel) {
+        sqlClient.query("UPDATE cliente SET saldo =" + saldo + " WHERE id =" + id).execute(asyncResult -> {
+            if (asyncResult.succeeded()) {
+                String insertQuery = "INSERT INTO transacao (cliente_id, valor, tipo, descricao, data) VALUES (%s, %s, '%s', '%s', '%s')";
+                String query = String.format(insertQuery, transacaoModel.getId(), transacaoModel.getValor(), transacaoModel.getTipo(), transacaoModel.getDescricao(), getData());
+                sqlClient.query(query).execute(asyncResult1 -> {
+
+                });
+            }
+        });
+    }
 
 
-  public ClienteModel getCliente(int id) {
-    return null;
-  }
-
-  public RespostaExtrato getExtrato() {
-    return new RespostaExtrato(null,null);
-  }
-
-
-
-
-
+    public RespostaExtrato getExtrato() {
+        return null;
+    }
 }

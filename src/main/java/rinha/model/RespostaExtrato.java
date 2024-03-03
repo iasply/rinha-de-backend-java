@@ -1,4 +1,7 @@
-package rinha;
+package rinha.model;
+
+import rinha.model.Saldo;
+import rinha.model.Transacao;
 
 import java.util.List;
 

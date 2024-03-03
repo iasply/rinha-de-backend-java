@@ -1,17 +1,21 @@
-version: '3.8'
-
 services:
-  postgres:
+
+  db:
     image: postgres:alpine
-    container_name: meu_postgres
-    restart: always
-    environment:
-      POSTGRES_USER: rinha
-      POSTGRES_PASSWORD: rinha
-      POSTGRES_DB: rinha
+    hostname: db
     volumes:
-      - ./db:/docker-entrypoint-initdb.d/meu_script.sql
-      - ./pgconfig:/etc/postgresql/pg_hba.conf
+      - ./postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+     # - ./pg_hba.conf:/etc/postgresql/pg_hba.conf
+    environment:
+      - POSTGRES_USER=rinha
+      - POSTGRES_PASSWORD=rinha
+      - POSTGRES_DB=rinha
     ports:
       - "5432:5432"
-    command: [ "postgres", "-c", "listen_addresses=*", "-c", "config_file=/etc/postgresql/pg_hba.conf" ]
+    command: [ "postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
+
+networks:
+  default:
+    driver: bridge
+    name: rinha-nginx-2024q1

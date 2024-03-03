@@ -1,6 +1,5 @@
 package rinha.model;
 
-import io.reactivex.rxjava3.annotations.NonNull;
 
 public class TransacaoModel {
   private int id;
@@ -11,15 +10,15 @@ public class TransacaoModel {
   public TransacaoModel() {
   }
 
-  public void setValor(@NonNull int valor) {
+  public void setValor( int valor) {
     this.valor = valor;
   }
 
-  public void setTipo(@NonNull String tipo) {
+  public void setTipo(String tipo) {
     this.tipo = tipo;
   }
 
-  public void setDescricao(@NonNull String descricao) {
+  public void setDescricao( String descricao) {
     this.descricao = descricao;
   }
 

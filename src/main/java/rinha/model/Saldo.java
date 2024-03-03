@@ -1,8 +1,6 @@
-package rinha;
+package rinha.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.time.LocalDateTime;
 
 public class Saldo {
   private int total;

@@ -20,7 +20,7 @@ public class RinhaApplication {
 
         PgConnectOptions connectOptions = new PgConnectOptions()
                 .setPort(5432)
-//                .setHost("localhost") //dev
+                // .setHost("localhost") //dev
                 .setHost(System.getenv("PGHOST"))//deploy
                 .setDatabase("rinha")
                 .setUser("rinha")
@@ -29,7 +29,7 @@ public class RinhaApplication {
 
 
         PoolOptions poolOptions = new PoolOptions()
-                .setMaxSize(20);
+                .setMaxSize(30);
 
         Pool client = PgBuilder
                 .pool()
@@ -45,9 +45,8 @@ public class RinhaApplication {
             } else {
                 System.out.println("Connection failed: " + ar.cause().getCause());
                 ar.cause().printStackTrace();
-                }
-
-
+                System.exit(1);
+            }
         });
 
         vertx.deployVerticle(new MainVert(client))

@@ -11,9 +11,11 @@ services:
       - PGHOST=172.17.0.2
     depends_on:
       - db
+    restart: always
   api02:
     <<: *api
     network_mode: bridge
+    restart: always
     environment:
       - PGHOST=172.17.0.2
     ports:

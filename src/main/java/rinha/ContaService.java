@@ -21,6 +21,7 @@ public class ContaService {
     }
 
     public void retornoSaldo(RoutingContext rc) {
+
         TransacaoModel transacaoModel = ValidarJson.validarTransacao(rc);
         if (transacaoModel == null) {
             rc.fail(400);
@@ -37,8 +38,9 @@ public class ContaService {
                 clienteModel.setSaldo(row.getInteger("saldo"));
 
                 boolean b = validacaoSaldo(clienteModel, transacaoModel);
-                if (!b) {
+                if (b) {
                     rc.fail(422);
+                    System.out.println("validacao saldo rc 422");
                     return;
                 }
 
@@ -67,6 +69,8 @@ public class ContaService {
 
 
             });
+        }).onFailure(throwable -> {
+            throwable.printStackTrace();
         });
 
     }
@@ -77,6 +81,7 @@ public class ContaService {
         String s = rc.pathParam("id");
         int id = Integer.parseInt(s);
         if (!(id < 6 && id > 0)) {
+            System.out.println("erro do id");
             throw new RuntimeException();
         }
 
@@ -100,7 +105,7 @@ public class ContaService {
                     }
             );
 
-            Future<RowSet<Row>> rowSetFuture2 =  cr.getCliente(id);
+            Future<RowSet<Row>> rowSetFuture2 = cr.getCliente(id);
             rowSetFuture2.onComplete(asyncResult1 -> {
                 Saldo saldo = new Saldo();
 
@@ -122,16 +127,21 @@ public class ContaService {
                 rc.fail(400);
 
             });
+        }).onFailure(throwable -> {
+            throwable.printStackTrace();
         });
 
 
     }
 
     private boolean validacaoSaldo(ClienteModel clienteModel, TransacaoModel transacaoModel) {
-        if (transacaoModel.getTipo() == "c") {
-            return true;
+        if (transacaoModel.getValor() < 0) {
+            return false;
         }
-        return (clienteModel.getSaldo() - transacaoModel.getValor()) > (-clienteModel.getLimite());
+        if (transacaoModel.getTipo().equals("c")) {
+            return (clienteModel.getSaldo() + transacaoModel.getValor()) > (clienteModel.getLimite());
+        }
+        return (clienteModel.getSaldo() - transacaoModel.getValor()) < (-clienteModel.getLimite());
     }
 
     private Integer novoSaldo(Integer saldoAtual, Integer valorTransacao, String tipo) {

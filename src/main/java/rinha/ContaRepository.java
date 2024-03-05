@@ -18,7 +18,7 @@ public class ContaRepository {
 
 
     public Future<RowSet<Row>> getCliente(int id) {
-        return sqlClient.query("SELECT * FROM cliente WHERE id =" + id).execute().onComplete(rowSetAsyncResult -> {
+        return sqlClient.preparedQuery("SELECT * FROM cliente WHERE id =" + id).execute().onComplete(rowSetAsyncResult -> {
             if (rowSetAsyncResult.succeeded()) {
                 RowSet<Row> result = rowSetAsyncResult.result();
             } else {
@@ -28,7 +28,7 @@ public class ContaRepository {
     }
 
     public void updateCliente(int id, Integer saldo, TransacaoModel transacaoModel) {
-        sqlClient.query("UPDATE cliente SET saldo =" + saldo + " WHERE id =" + id).execute(asyncResult -> {
+        sqlClient.preparedQuery("UPDATE cliente SET saldo =" + saldo + " WHERE id =" + id).execute(asyncResult -> {
             if (asyncResult.succeeded()) {
                 String insertQuery = "INSERT INTO transacao (cliente_id, valor, tipo, descricao, data) VALUES (%s, %s, '%s', '%s', '%s')";
                 String query = String.format(insertQuery, transacaoModel.getId(), transacaoModel.getValor(), transacaoModel.getTipo(), transacaoModel.getDescricao(), getData());
@@ -41,7 +41,7 @@ public class ContaRepository {
 
 
     public Future<RowSet<Row>> getExtrato(int id) {
-       return sqlClient.query(
+       return sqlClient.preparedQuery(
                "    SELECT *\n" +
                "    FROM transacao \n" +
                "    WHERE cliente_id = \n" +id+

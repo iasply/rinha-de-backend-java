@@ -29,7 +29,7 @@ public class RinhaApplication {
 
 
         PoolOptions poolOptions = new PoolOptions()
-                .setMaxSize(30);
+                .setMaxSize(20);
 
         Pool client = PgBuilder
                 .pool()

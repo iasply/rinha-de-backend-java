@@ -7,8 +7,9 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
 import rinha.model.*;
-import rinha.util.Util;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,59 +21,31 @@ public class ContaService {
         this.cr = cr;
     }
 
-    public void retornoSaldo(RoutingContext rc) {
 
+    public void retornoSaldo(RoutingContext rc) {
         TransacaoModel transacaoModel = ValidarJson.validarTransacao(rc);
         if (transacaoModel == null) {
             rc.fail(400);
             return;
         }
+        Future<RowSet<Row>> rowSetFuture = cr.updateViaFuncao(transacaoModel);
 
-        Future<RowSet<Row>> rowSetFuture = cr.getCliente(transacaoModel.getId());
-        rowSetFuture.onComplete(asyncResult -> {
-            asyncResult.result().forEach(row -> {
+        rowSetFuture.onFailure(throwable -> {
+            rc.fail(422);
 
-                ClienteModel clienteModel = new ClienteModel();
-                clienteModel.setId(row.getInteger("id"));
-                clienteModel.setLimite(row.getInteger("limite"));
-                clienteModel.setSaldo(row.getInteger("saldo"));
-
-                boolean b = validacaoSaldo(clienteModel, transacaoModel);
-                if (b) {
-                    rc.fail(422);
-                    System.out.println("validacao saldo rc 422");
-                    return;
-                }
-
-
-                cr.updateCliente(
-                        clienteModel.getId(),
-                        novoSaldo(
-                                clienteModel.getSaldo(),
-                                transacaoModel.getValor(),
-                                transacaoModel.getTipo()
-                        ),
-                        transacaoModel);
-
-
-                SaldoModel saldo = new SaldoModel();
-                saldo.setSaldo(
-                        transacaoModel.getTipo().equals("c") ?
-                                clienteModel.getSaldo() + transacaoModel.getValor() :
-                                clienteModel.getSaldo() - transacaoModel.getValor()
-                );
-
-                saldo.setLimite(clienteModel.getLimite());
-                JsonObject jsonObject = JsonObject.mapFrom(saldo);
-
-                rc.end(jsonObject.encode());
-
-
-            });
-        }).onFailure(throwable -> {
-            throwable.printStackTrace();
         });
 
+        rowSetFuture.onComplete(asyncResult -> {
+            if (asyncResult.succeeded()) {
+                asyncResult.result().forEach(row -> {
+                    SaldoModel saldoModel = new SaldoModel();
+                    saldoModel.setSaldo(row.getInteger("new_saldo"));
+                    saldoModel.setLimite(row.getInteger("limite"));
+                    JsonObject jsonObject = JsonObject.mapFrom(saldoModel);
+                    rc.end(jsonObject.encode());
+                });
+            }
+        });
     }
 
     public void retornoExtrato(RoutingContext rc) {
@@ -82,7 +55,9 @@ public class ContaService {
         int id = Integer.parseInt(s);
         if (!(id < 6 && id > 0)) {
             System.out.println("erro do id");
-            throw new RuntimeException();
+            rc.fail(404);
+            return;
+
         }
 
         Future<RowSet<Row>> rowSetFuture = cr.getExtrato(id);
@@ -98,7 +73,7 @@ public class ContaService {
                         Transacao transacao = new Transacao();
                         transacao.setDescricao(row.getString("descricao"));
                         transacao.setTipo(row.getString("tipo"));
-                        transacao.setRealizada_em(row.getString("data"));
+                        transacao.setRealizada_em(String.valueOf(row.getLocalDateTime("realizada_em")));
                         transacao.setValor(row.getInteger("valor"));
                         list.add(transacao);
 
@@ -113,13 +88,13 @@ public class ContaService {
                         row -> {
                             saldo.setLimite(row.getInteger("limite"));
                             saldo.setTotal(row.getInteger("saldo"));
+
                         }
                 );
-                saldo.setData_extrato(Util.getData());
-
+                LocalDateTime agora = LocalDateTime.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'");
+                saldo.setData_extrato(agora.format(formatter));
                 RespostaExtrato respostaExtrato = new RespostaExtrato(saldo, list);
-
-
                 if (respostaExtrato != null) {
                     rc.end(JsonObject.mapFrom(respostaExtrato).encodePrettily());
                     return;
@@ -134,19 +109,6 @@ public class ContaService {
 
     }
 
-    private boolean validacaoSaldo(ClienteModel clienteModel, TransacaoModel transacaoModel) {
-        if (transacaoModel.getValor() < 0) {
-            return false;
-        }
-        if (transacaoModel.getTipo().equals("c")) {
-            return (clienteModel.getSaldo() + transacaoModel.getValor()) > (clienteModel.getLimite());
-        }
-        return (clienteModel.getSaldo() - transacaoModel.getValor()) < (-clienteModel.getLimite());
-    }
 
-    private Integer novoSaldo(Integer saldoAtual, Integer valorTransacao, String tipo) {
-        Integer integer = tipo.equals("c") ? saldoAtual + valorTransacao : saldoAtual - valorTransacao;
-        return integer;
-    }
 
 }

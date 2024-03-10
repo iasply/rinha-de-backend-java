@@ -24,8 +24,8 @@ public class ValidarJson {
 
       JsonObject js = rc.getBodyAsJson();
 
-      transacaoModel.setValor(js.getInteger("valor"));
-
+      transacaoModel.setValor(Integer.parseInt(js.getString("valor")));
+      System.out.println(transacaoModel.getValor());
       String tipo = js.getString("tipo");
       if (!((Objects.equals(tipo, "c")) || (Objects.equals(tipo, "d")))) {
         return null;

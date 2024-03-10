@@ -4,6 +4,7 @@ package rinha.model;
 
 public class Saldo {
   private int total;
+
   private String data_extrato;
   private int limite;
 

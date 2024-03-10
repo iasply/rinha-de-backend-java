@@ -1,7 +1,9 @@
 package rinha.model;
 
 
-  public class Transacao {
+import java.time.LocalDateTime;
+
+public class Transacao {
     private int valor;
     private String tipo;
     private String descricao;
@@ -32,11 +34,11 @@ package rinha.model;
     }
 
     public String getRealizada_em() {
-      return realizada_em;
+        return realizada_em;
     }
 
     public void setRealizada_em(String realizada_em) {
-      this.realizada_em = realizada_em;
+        this.realizada_em = realizada_em;
     }
-  }
+}
 

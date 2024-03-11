@@ -11,4 +11,5 @@ Submissão feita com:
 
   - repositório da api => (https://github.com/iasply/rinha-de-backend-java)
 
+  - contato => (https://twitter.com/iasply)
   

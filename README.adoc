@@ -9,6 +9,6 @@ Submissão feita com:
 
   - `java 21` para api com as libs `vert.x`
 
-  - [repositório da api] https://github.com/iasply/rinha-de-backend-java)
+  - [repositório da api](https://github.com/iasply/rinha-de-backend-java)
 
   

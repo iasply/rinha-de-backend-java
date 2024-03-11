@@ -1,9 +1,6 @@
 services:
   api01: &api
-    build:
-      context: ./
-      dockerfile: ./Dockerfile
-    image: vert/api
+    image: iuryasilva/api
     network_mode: bridge
     ports:
       - "8082:8888"

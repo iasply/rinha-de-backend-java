@@ -20,8 +20,8 @@ public class RinhaApplication {
 
         PgConnectOptions connectOptions = new PgConnectOptions()
                 .setPort(5432)
-                 .setHost("localhost") //dev
-                //.setHost(System.getenv("PGHOST"))//deploy
+                 //.setHost("localhost") //dev
+                .setHost(System.getenv("PGHOST"))//deploy
                 .setDatabase("rinha")
                 .setUser("rinha")
                 .setPassword("rinha")
